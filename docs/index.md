@@ -3,39 +3,36 @@ layout: home
 
 hero:
   name: Statosphere Guide
-  text: Variables, Classifiers, Generators, and Content Rules for Chub.ai
-  tagline: An unofficial third-party guide to Lord-Raven/statosphere — making the codebase legible to botmakers and developers.
+  text: Variables, classifiers, and generators for your Chub.ai bots — no code required.
+  tagline: An unofficial guide to Lord-Raven's Statosphere stage. Add stat tracking, behavior rules, image generation, and more to any Chub.ai bot through simple JSON config.
   actions:
     - theme: brand
       text: Get Started
       link: /introduction
     - theme: alt
-      text: View on GitHub
+      text: Statosphere on GitHub
       link: https://github.com/Lord-Raven/statosphere
 
 features:
   - title: Variables
-    details: Persistent state across turns — per-turn, per-input, pre/post-response update phases, with automatic non-constant promotion when referenced by generators or classifiers.
-    link: /concepts/variables
+    details: Track numbers, strings, and flags that persist across the conversation — health points, relationship scores, current mood, scene name, and anything else you want to remember.
+    link: /syntax/variables
   - title: Classifiers
-    details: Zero-shot NLI classification via remote Gradio, in-browser Xenova, or LLM-driven entailment scoring. Candidate labels, category grouping, and dynamic label expressions.
-    link: /concepts/classifiers
+    details: Automatically read the mood, topic, or meaning of what the user or bot says, and update your variables accordingly — no manual triggers needed.
+    link: /syntax/classifiers
   - title: Generators
-    details: Text, image, and image-to-image generation gated by conditions and phases. Results update variables. Retry logic via configurable condition expressions.
-    link: /concepts/generators
+    details: Fire extra LLM or image-generation calls to produce scene art, recap summaries, or any creative content, gated on conditions you define.
+    link: /syntax/generators
   - title: Content Rules
-    details: Five categories (Input, Post Input, Stage Direction, Response, Post Response) with condition + modification expressions to rewrite messages and inject system prompts.
-    link: /concepts/content-rules
-  - title: Templating
-    details: "Template tags: user, char, personality, scenario, plus all variable names (case-insensitive). Known quirks: the regex [A-z] includes punctuation."
-    link: /templating
-  - title: Stage Lifecycle
-    details: End-to-end walkthrough of beforePrompt and afterResponse — what runs when, the busy-wait loop, and how LoadResponse.error is repurposed.
-    link: /lifecycle
+    details: Rewrite the user's message before the bot sees it, inject hidden instructions, or filter the bot's reply before it appears in chat — all driven by your variables.
+    link: /syntax/content-rules
+  - title: Expressions
+    details: Every formula field accepts a small expression language (mathjs) with arithmetic, comparisons, string operations, and Statosphere's own helpers like contains() and capture().
+    link: /syntax/expressions
 ---
 
 ## About This Guide
 
 This is an unofficial third-party guide to [Statosphere](https://github.com/Lord-Raven/statosphere), a Chub.ai stage extension by Lord-Raven. It is not produced or endorsed by the Statosphere maintainers.
 
-The guide is pinned to commit [`e67cd9f`](https://github.com/Lord-Raven/statosphere/tree/e67cd9ffaf1ee63e7b5c7bce11462516f547f5f7). Every nontrivial claim cites a source permalink at that commit. The upstream README is two lines; substantive documentation lives inside `creator_notes` in `chub_meta.yaml`. This guide makes the full codebase legible.
+The guide is pinned to commit [`e67cd9f`](https://github.com/Lord-Raven/statosphere/tree/e67cd9ffaf1ee63e7b5c7bce11462516f547f5f7). Where a default value or specific behavior is non-obvious, claims link to the source at that commit.

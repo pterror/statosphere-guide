@@ -2,84 +2,93 @@
 
 <div v-pre>
 
-## How a Botmaker Uses Statosphere
+## Step 1: Add the stage to your bot or chat
 
-Statosphere is configured entirely through JSON. There is no code to write — every behavior is defined as data: arrays of variable definitions, function definitions, classifier definitions, generator definitions, and content rules.
+Statosphere needs to be added before it does anything. You have two options:
 
-The workflow is:
+- **Per-chat:** Open a chat's settings, find the stage dropdown, and search for "Statosphere." Add it to that specific chat.
+- **Per-bot (recommended for sharing):** On your bot's page, scroll down to the Stages section and add Statosphere there. This applies it for everyone who starts a new chat with your bot.
 
-1. Open the external editor at [https://lord-raven.github.io/statosphere-editor/](https://lord-raven.github.io/statosphere-editor/).
-2. Build your configuration using the editor's GUI.
-3. Copy the resulting JSON.
-4. In Chub.ai, navigate to the character's stage configuration.
-5. Paste the JSON into the stage config field.
-6. Refresh the chat.
+The creator recommends testing in a specific chat first before applying to a public bot.
 
-The stage reads the config JSON during `load()` ([`Stage.tsx:L119-L328`](https://github.com/Lord-Raven/statosphere/blob/e67cd9ffaf1ee63e7b5c7bce11462516f547f5f7/src/Stage.tsx#L119-L328)), validates each section against Ajv JSON schemas, and initializes the runtime objects.
+## Step 2: Open the config editor
 
-## The Five-Element Model
+Statosphere does nothing without configuration. Rather than handwriting JSON, use the official external editor:
 
-A Statosphere config is an object with up to five arrays:
+**[lord-raven.github.io/statosphere-editor/](https://lord-raven.github.io/statosphere-editor/)**
 
-```json
-{
-  "variables": [...],
-  "functions": [...],
-  "classifiers": [...],
-  "generators": [...],
-  "content": [...]
-}
-```
+Build your setup in the editor's GUI, then click "Copy" at the bottom to get the JSON.
 
-Each array is validated against the corresponding schema in `src/assets/`:
+## Step 3: Paste into the stage config modal
 
-- `variable-schema.json`
-- `function-schema.json`
-- `classifier-schema.json`
-- `generator-schema.json`
-- `content-schema.json`
+1. In Chub, open the chat or bot settings and find the Statosphere stage.
+2. Open its configuration modal. You will see a single text field labeled "Configuration."
+3. Paste the JSON from the editor into that field.
+4. Save.
 
-See the [Schemas reference](./reference/schemas) for field-by-field documentation.
+## Step 4: Refresh the chat
 
-## The `/setVar` User Command
+Statosphere reads the config when the page loads. After pasting, refresh the chat page to pick up the new config.
 
-During any turn, the user can set a variable directly by typing a command in their message:
+## A minimal working example
 
-```
-/setVar mood=happy
-```
-
-The stage scans for this pattern in `beforePrompt` using the regex `/\/setvar\s+([A-Za-z_]\w*)\s*=\s*([^\n\r]+)/i` and strips the command from the message before it reaches the LLM. See [`Stage.tsx:L818-L838`](https://github.com/Lord-Raven/statosphere/blob/e67cd9ffaf1ee63e7b5c7bce11462516f547f5f7/src/Stage.tsx#L818-L838).
-
-Multiple `/setVar` commands can appear in a single message. Each is processed in order. This is the primary mechanism for players to interact with the variable system directly.
-
-## The `debugMode` Variable
-
-If the stage has a variable named `debugMode` whose value evaluates to truthy, additional diagnostic output is surfaced. This is a convention in the config, not a hard-coded flag — you define it as an ordinary variable and set it to `1` when debugging.
-
-## Minimal Working Example
-
-A config that tracks a simple integer counter incremented on every turn:
+Here is a complete config you could paste right now. It tracks a `mood` variable and flips it when the classifier detects positive or negative sentiment in the user's message.
 
 ```json
 {
   "variables": [
     {
-      "name": "turnCount",
-      "initialValue": "0",
-      "perTurnUpdate": "turnCount + 1"
+      "name": "mood",
+      "initialValue": "\"neutral\""
+    }
+  ],
+  "classifiers": [
+    {
+      "name": "Sentiment",
+      "inputTemplate": "{{content}}",
+      "inputHypothesis": "This message expresses {} sentiment.",
+      "classifications": [
+        {
+          "label": "positive",
+          "category": "sentiment",
+          "threshold": 0.6,
+          "updates": [
+            { "variable": "mood", "setTo": "\"happy\"" }
+          ]
+        },
+        {
+          "label": "negative",
+          "category": "sentiment",
+          "threshold": 0.6,
+          "updates": [
+            { "variable": "mood", "setTo": "\"unhappy\"" }
+          ]
+        }
+      ]
     }
   ],
   "content": [
     {
       "category": "Stage Direction",
       "condition": "true",
-      "modification": "Turn number: {{turnCount}}"
+      "modification": "\"The user's current mood is: \" + mood"
     }
   ]
 }
 ```
 
-After each turn, `turnCount` is incremented and injected into the system prompt as a stage direction. The `{{turnCount}}` template substitution is handled by `replaceTags` ([`Stage.tsx:L683-L699`](https://github.com/Lord-Raven/statosphere/blob/e67cd9ffaf1ee63e7b5c7bce11462516f547f5f7/src/Stage.tsx#L683-L699)).
+What this does:
+- Starts with `mood = "neutral"`.
+- After each user message, the classifier checks whether it sounds positive or negative.
+- Whichever label wins (above threshold 0.6) sets `mood` to the matching string.
+- A Stage Direction injects the current mood as a hidden instruction before the bot replies.
+
+## Editing an existing config
+
+Drop your current config JSON back into the editor to modify it, then copy and re-paste. The editor understands the full config shape.
+
+## Debugging
+
+Open your browser's developer console (F12 → Console tab) after refreshing. Statosphere logs a lot there, including what it loaded, what classifiers fired, and any errors. See [Debug Mode](./special/debug-mode) for how to get even more output.
 
 </div>

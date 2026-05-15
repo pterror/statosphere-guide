@@ -1,54 +1,53 @@
 # Introduction
 
-## What Is Statosphere?
+Statosphere is a Chub.ai stage extension that gives you tools to make your bots smarter and more reactive — without writing any code. You describe what you want in a JSON config file, and Statosphere handles the rest: reading the conversation, updating your variables, injecting instructions, and generating images or extra text.
 
-Statosphere is a Chub.ai "stage" — a JavaScript module that intercepts every message in a chat before it reaches the LLM and after the LLM responds. A stage can inspect and rewrite both sides of that exchange, inject system prompts, fire off image generation requests, and maintain persistent state across turns.
+## What it lets you do
 
-The extension is authored by Lord-Raven and published at [https://github.com/Lord-Raven/statosphere](https://github.com/Lord-Raven/statosphere). This guide is pinned to commit [`e67cd9f`](https://github.com/Lord-Raven/statosphere/tree/e67cd9ffaf1ee63e7b5c7bce11462516f547f5f7).
+Here are six concrete things botmakers use it for, drawn from the [creator's own notes](https://github.com/Lord-Raven/statosphere/blob/e67cd9ffaf1ee63e7b5c7bce11462516f547f5f7/public/chub_meta.yaml).
 
-## What Is a Chub Stage?
+### 1. Stat tracking and display
 
-Chub.ai (Character Hub) supports a "stage" plugin interface. A stage is a class that extends `StageBase` from `@chub-ai/stages-ts` and exports two primary methods:
+Keep numeric stats like HP, gold, relationship scores, or sanity. A classifier watches for relevant events in the conversation (damage, healing, spending), updates the number, and a content rule surfaces it in the bot's replies or as a hidden system note.
 
-- `beforePrompt(userMessage)` — called after the user sends a message but before the LLM sees it.
-- `afterResponse(botMessage)` — called after the LLM responds but before the response is displayed.
+### 2. Scenario escalation
 
-Each method can return a modified user message, system-prompt additions (called `stageDirections` and `systemMessage`), and persistent chat state.
+Increment a turn counter each time the user sends a message. Feed that counter into content rules that inject new scenario details — rising tension, new NPCs appearing, doors unlocking — as the number grows. Add a classifier to speed up or slow down the pace based on what's happening in the story.
 
-Statosphere's entry point is a single library export:
+### 3. Behavior reinforcement
 
-```
-src/index.ts  →  export { Stage as Stage } from "./Stage"
-```
+Use a classifier to detect when the user's message should trigger one of the bot's quirks or rules. When the classifier fires, a content rule adds a Stage Direction reminding the bot of that rule — nudging it without the user seeing the instruction.
 
-See [`src/index.ts:L1`](https://github.com/Lord-Raven/statosphere/blob/e67cd9ffaf1ee63e7b5c7bce11462516f547f5f7/src/index.ts#L1).
+### 4. Dynamic response guidance
 
-## How the Application Bootstraps
+Detect what the user is doing: examining something, moving on, asking a question, taking action. Then inject different writing instructions for each case. "The user is examining an object — be descriptive." "The user is ending the scene — introduce the next one."
 
-In development mode, [`src/App.tsx`](https://github.com/Lord-Raven/statosphere/blob/e67cd9ffaf1ee63e7b5c7bce11462516f547f5f7/src/App.tsx#L1-L13) picks `TestStageRunner` (a local harness that loads `assets/test-init.json`). In production it uses `ReactRunner`. Both paths instantiate `new Stage(data)`.
+### 5. Input clean-up
 
-[`src/main.tsx`](https://github.com/Lord-Raven/statosphere/blob/e67cd9ffaf1ee63e7b5c7bce11462516f547f5f7/src/main.tsx#L1-L15) is a standard ReactDOM bootstrap that mounts `<App />` into the DOM.
+Some users write messages with bracketed out-of-character instructions. An Input content rule can strip those brackets, move the instruction into a hidden Stage Direction, and leave the chat history clean.
 
-## What Problem Does Statosphere Solve?
+### 6. Content generation
 
-A plain Chub.ai character card has no persistent state beyond the conversation history itself. Statosphere adds:
+Use generators to make extra LLM calls: produce a one-sentence recap of recent events, write flavor text, or update a scene background image whenever the location changes. Generators can store their output in variables, which other rules then use.
 
-- **Variables** — numeric or string values that persist across turns and can be updated by expressions evaluated by `mathjs`.
-- **Classifiers** — zero-shot NLI classification that reads the latest message and sets variables based on detected sentiment, topic, or intent.
-- **Generators** — text and image generation (via a Gradio backend or the LLM itself) triggered at configurable phases.
-- **Content Rules** — conditional rewriting of user input, LLM output, and the system prompt.
-- **Custom Functions** — user-defined mathjs functions that can be called from any expression.
+## Five building blocks
 
-Together these allow botmakers to build characters with mood systems, dynamic scene descriptions, conditional story triggers, and any other state-driven behavior without writing custom code.
+Everything in Statosphere is built from five types of configuration objects:
 
-## Five Core Elements
+| Building block | What it does |
+|---|---|
+| **Variables** | Named values you track and update across turns |
+| **Functions** | Reusable expression helpers you define once and call anywhere |
+| **Classifiers** | Rules that read what was said and update variables accordingly |
+| **Generators** | Extra LLM or image calls whose results are stored in variables |
+| **Content Rules** | Rules that modify what the user sends, what the bot sees, or what gets displayed |
 
-The five elements are described in `public/chub_meta.yaml`'s `creator_notes` field, which is the primary user-facing manual for the extension. This guide expands on each element with implementation details drawn from the source.
+All five live in the same JSON config. You do not have to use all five — a simple stat tracker might only need variables, a classifier, and a content rule.
 
-| Element | Docs Page |
-|---------|-----------|
-| Variables | [Concepts: Variables](./concepts/variables) |
-| Functions | [Concepts: Functions](./concepts/functions) |
-| Classifiers | [Concepts: Classifiers](./concepts/classifiers) |
-| Generators | [Concepts: Generators](./concepts/generators) |
-| Content Rules | [Concepts: Content Rules](./concepts/content-rules) |
+## What Statosphere cannot do
+
+- It only works on Chub.ai. Users on other frontends will not see any effects.
+- Its config is visible to users — any logic you build can be inspected.
+- Every zero-shot classifier call hits an external Hugging Face inference endpoint. If that endpoint is down, Statosphere falls back to a much smaller local model and results will be less accurate.
+- Generators make additional LLM calls. Bots that use them will respond more slowly and cost more tokens.
+- Configuration changes do not appear to create a new version-history entry on Chub, so it is easy to accidentally overwrite your config with no easy undo.

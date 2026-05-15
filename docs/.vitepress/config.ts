@@ -2,7 +2,7 @@ import { defineConfig } from 'vitepress'
 
 export default defineConfig({
   title: 'Statosphere Guide',
-  description: 'A comprehensive guide to Statosphere — the Chub.ai stage for variables, classifiers, and generators',
+  description: 'Variables, classifiers, and generators for your Chub.ai bots — no code required.',
   base: '/statosphere-guide/',
 
   themeConfig: {
@@ -18,32 +18,47 @@ export default defineConfig({
 
     sidebar: [
       {
-        text: 'Guide',
+        text: 'Start',
         items: [
           { text: 'Introduction', link: '/introduction' },
           { text: 'Getting Started', link: '/getting-started' },
-          { text: 'Stage Lifecycle', link: '/lifecycle' },
-          { text: 'Templating', link: '/templating' },
-          { text: 'Classification Backends', link: '/classification-backends' },
-          { text: 'MCP and Environment', link: '/mcp-and-environment' },
-          { text: 'Gotchas', link: '/gotchas' },
         ],
       },
       {
-        text: 'Concepts',
+        text: 'Syntax',
         items: [
-          { text: 'Variables', link: '/concepts/variables' },
-          { text: 'Functions', link: '/concepts/functions' },
-          { text: 'Classifiers', link: '/concepts/classifiers' },
-          { text: 'Generators', link: '/concepts/generators' },
-          { text: 'Content Rules', link: '/concepts/content-rules' },
+          { text: 'Overview', link: '/syntax/overview' },
+          { text: 'Variables', link: '/syntax/variables' },
+          { text: 'Expressions', link: '/syntax/expressions' },
+          { text: 'Functions', link: '/syntax/functions' },
+          { text: 'Classifiers', link: '/syntax/classifiers' },
+          { text: 'Generators', link: '/syntax/generators' },
+          { text: 'Content Rules', link: '/syntax/content-rules' },
+        ],
+      },
+      {
+        text: 'Recipes',
+        items: [
+          { text: 'Stat Tracking', link: '/recipes/stat-tracking' },
+          { text: 'Scene Direction', link: '/recipes/scene-direction' },
+          { text: 'Response Guidance', link: '/recipes/response-guidance' },
+          { text: 'Input Cleanup', link: '/recipes/input-cleanup' },
+        ],
+      },
+      {
+        text: 'Special',
+        items: [
+          { text: '/setVar Command', link: '/special/setvar' },
+          { text: 'Debug Mode', link: '/special/debug-mode' },
+          { text: 'Background Variable', link: '/special/background' },
+          { text: 'Turn Order', link: '/special/turn-order' },
         ],
       },
       {
         text: 'Reference',
         items: [
-          { text: 'Schemas', link: '/reference/schemas' },
-          { text: 'Build', link: '/reference/build' },
+          { text: 'Quick Reference', link: '/reference/quick-reference' },
+          { text: 'Gotchas', link: '/reference/gotchas' },
         ],
       },
     ],

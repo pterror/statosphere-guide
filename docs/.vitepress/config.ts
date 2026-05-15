@@ -46,6 +46,14 @@ export default defineConfig({
         ],
       },
       {
+        text: 'Feasibility',
+        items: [
+          { text: 'Can I build this?', link: '/feasibility/' },
+          { text: 'Worked Sketches', link: '/feasibility/worked-sketches' },
+          { text: 'Patterns', link: '/feasibility/patterns' },
+        ],
+      },
+      {
         text: 'Special',
         items: [
           { text: '/setVar Command', link: '/special/setvar' },

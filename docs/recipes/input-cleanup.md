@@ -15,18 +15,6 @@ Some users write out-of-character instructions alongside their in-character mess
       "perTurnUpdate": "\"\""
     }
   ],
-  "functions": [
-    {
-      "name": "extractOoc",
-      "parameters": "text",
-      "body": "capture(text, \"\\\\[([^\\\\]]+)\\\\]\")"
-    },
-    {
-      "name": "stripOoc",
-      "parameters": "text",
-      "body": "join(split(text, \"[\"), join(split(join(split(text, \"[\"), \"§\"), \"§\" + capture(text, \"\\\\[([^\\\\]]+)\\\\]\") + \"]\"), \"\"))"
-    }
-  ],
   "classifiers": [
     {
       "name": "OocDetector",
@@ -39,7 +27,7 @@ Some users write out-of-character instructions alongside their in-character mess
           "updates": [
             {
               "variable": "oocInstruction",
-              "setTo": "capture(\"{{content}}\", \"\\\\[([^\\\\]]+)\\\\]\")"
+              "setTo": "capture(\"{{content}}\", \"\\\\[([^\\\\]]+)\\\\]\")[0][0]"
             }
           ]
         }
@@ -65,11 +53,11 @@ Some users write out-of-character instructions alongside their in-character mess
 
 1. `oocInstruction` starts empty and resets to empty at the start of every turn via `perTurnUpdate`.
 
-2. `OocDetector` checks whether the user's message contains bracketed text. If so, it captures the text inside the brackets and stores it in `oocInstruction`.
+2. `OocDetector` checks whether the user's message contains bracketed text. If the classifier fires, it captures the text inside the brackets and stores it in `oocInstruction`. The `[0][0]` indexing is necessary because `capture()` returns an array of arrays — one sub-array per match, each containing its capture groups — so `[0][0]` extracts the first capture group of the first match as a plain string.
 
-3. The `Input` rule fires when `oocInstruction` is not empty. It joins the message back together with the bracket block removed, so the bot never sees the raw `[...]` text.
+3. The `Input` rule fires when `oocInstruction` is not empty. It strips the full `[...]` block from the message so the bot never sees it.
 
-4. The `Stage Direction` rule takes the captured instruction and injects it as an author's note — a hidden instruction the bot does see but the user never notices in the chat history.
+4. The `Stage Direction` rule takes the captured instruction and injects it as an author's note — hidden from the chat history but visible to the bot.
 
 ## Simpler approach: no regex
 
@@ -100,7 +88,6 @@ This splits the message at `//` and sends the first half to the bot as the user'
 ## Important notes
 
 - The `replace` built-in has a known bug and may not work for regex-based stripping. The `split`/`join` approach in the simpler example avoids it entirely.
-- The built-in `capture()` returns an **array of arrays** (one sub-array per match, containing its capture groups), not a plain string. ([source](https://github.com/Lord-Raven/statosphere/blob/e67cd9ffaf1ee63e7b5c7bce11462516f547f5f7/src/Stage.tsx#L151-L154)) The complex OOC example above stores `capture(...)` into `oocInstruction`, which will be `[["the text"]]` rather than `"the text"`. Code that then does string operations on `oocInstruction` may produce `"[object Array]"` rather than the intended value. For reliable extraction of a single capture group, access `capture(...)[0][0]` in your custom function or update formula.
 - These rules only run on the current turn. Previous messages in the history are not affected.
 - If you want the bot to treat the instruction as very authoritative, consider using `"Post Input"` instead of `"Stage Direction"` to position it closer to the end of the prompt.
 

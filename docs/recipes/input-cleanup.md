@@ -88,6 +88,8 @@ If your users write instructions in square brackets like `[make this more dramat
 }
 ```
 
+The `[0][0]` picks the first match (`[0]`), then the first captured group within it (`[0]`) — that's how you get a plain string out of the nested array `capture` returns.
+
 How it works:
 
 1. `oocInstruction` starts empty and resets to empty at the start of every turn via `perTurnUpdate`.

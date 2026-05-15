@@ -50,6 +50,7 @@ export default defineConfig({
         items: [
           { text: '/setVar Command', link: '/special/setvar' },
           { text: 'Debug Mode', link: '/special/debug-mode' },
+          { text: 'Debugging Guide', link: '/special/debugging' },
           { text: 'Background Variable', link: '/special/background' },
           { text: 'Turn Order', link: '/special/turn-order' },
         ],

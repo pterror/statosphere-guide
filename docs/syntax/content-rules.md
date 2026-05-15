@@ -87,6 +87,68 @@ For **Stage Direction** and **Post Input** / **Post Response** categories, the c
 
 For **Input** and **Response** categories, the same rule applies: each rule's modification can build on or replace the previous output depending on whether it references `{{content}}`.
 
+## What the bot and user actually see
+
+The five categories differ in *who* sees the modified content and *when* it reaches the LLM. Here is a concrete breakdown.
+
+### Input
+
+You write:
+
+```json
+{ "category": "Input", "condition": "true", "modification": "\"[Turn \" + turnCount + \"] \" + \"{{content}}\"" }
+```
+
+What the LLM receives as the user's message: `[Turn 3] Let's go to the market`
+
+What the user sees in chat: `Let's go to the market` (the original, unmodified)
+
+Input modifications are invisible to the user. The chat history always shows the original message; the modified version is what the LLM actually processes.
+
+### Stage Direction
+
+You write:
+
+```json
+{ "category": "Stage Direction", "condition": "true", "modification": "\"{{content}} The character is feeling: \" + mood + \".\"" }
+```
+
+When `mood = "anxious"`, what the LLM receives: a hidden instruction appended to its prompt — `Response Instruction: The character is feeling: anxious.`
+
+What the user sees in chat: nothing. Stage Directions are invisible to the user entirely. They are never displayed in the conversation.
+
+The prefix `Response Instruction:` is added automatically by Statosphere. ([source](https://github.com/Lord-Raven/statosphere/blob/e67cd9ffaf1ee63e7b5c7bce11462516f547f5f7/src/Stage.tsx#L875))
+
+### Post Input
+
+You write:
+
+```json
+{ "category": "Post Input", "condition": "true", "modification": "\"The user appears to be asking about \" + topic + \".\"" }
+```
+
+What the LLM receives: the Post Input text inserted as a system message in the conversation — the LLM sees it as context between the user's message and its reply.
+
+What the user sees in chat: the Post Input text appears as a visible system notice in the conversation, inline between messages.
+
+### Response
+
+You write:
+
+```json
+{ "category": "Response", "condition": "true", "modification": "replace(\"{{content}}\", \"badword\", \"***\")" }
+```
+
+What the LLM originally produced: `You badword should leave.`
+
+What the user sees in chat: `You *** should leave.` (the modified version)
+
+Response modifications replace the bot's reply as shown to the user. The original is discarded.
+
+### Post Response
+
+Mirrors Post Input, but runs after the bot's reply. The Post Response text appears as a visible system notice in the conversation after the bot's message.
+
 ## Worked examples
 
 ### Inject a stat display into every Stage Direction

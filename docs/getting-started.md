@@ -81,6 +81,10 @@ Here is a complete config you could paste right now. It tracks a `mood` variable
 }
 ```
 
+::: tip Why the double quotes in `"\"neutral\""`?
+Every formula field in Statosphere is a string of code, and the inner `\"` marks tell it "this is a literal word, not a variable name." The double-quoted `"\"neutral\""` is a formula that evaluates to the string `neutral`. See the [variables page](./syntax/variables) for the full story — just copy the pattern for now.
+:::
+
 What this does:
 - Starts with `mood = "neutral"`.
 - After each user message, the classifier checks whether it sounds positive or negative.

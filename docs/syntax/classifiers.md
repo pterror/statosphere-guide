@@ -48,7 +48,7 @@ A label for the classifier, used in logs and as a dependency reference. Must be 
 
 ### condition
 
-A formula. The classifier only runs if this evaluates to true (or a number greater than zero). Omit or leave blank to always run.
+A formula. The classifier only runs if this evaluates to truthy (true or a number greater than zero). Omit or leave blank to always run.
 
 Classifiers are network calls, so adding a condition to avoid unnecessary ones is good practice.
 
@@ -114,7 +114,7 @@ The word or phrase substituted into `{}` in the hypothesis template. This is wha
 
 ### condition
 
-A formula. This label is only included in the classification task if this evaluates to true (or a number greater than zero). Use this to remove irrelevant labels and make the model's job easier (and faster).
+A formula. This label is only included in the classification task if this evaluates to truthy (true or a number greater than zero). Use this to remove irrelevant labels and make the model's job easier (and faster).
 
 ```json
 { "condition": "inCombat" }
@@ -139,6 +139,10 @@ The minimum score (0–1) for this label's updates to be applied. [Default: 0.7]
 { "threshold": 0.6 }
 { "threshold": 0.8 }
 ```
+
+#### Tuning the threshold
+
+Start with `0.6`. If your classifier never fires when it should, lower it (try `0.5`, then `0.4`). If it fires too eagerly — labels triggering when they shouldn't — raise it (try `0.7`, then `0.8`). Values below `0.3` will fire on almost anything; values above `0.9` only fire on near-certain matches. The default is `0.7`. ([source](https://github.com/Lord-Raven/statosphere/blob/e67cd9ffaf1ee63e7b5c7bce11462516f547f5f7/src/Classifier.tsx#L70))
 
 ### dynamic
 

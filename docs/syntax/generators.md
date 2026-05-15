@@ -65,7 +65,7 @@ Note: the schema previously listed an `"Initialization"` phase option but this w
 
 ### condition
 
-An expression. The generator only runs if this evaluates to truthy. Always set a condition — generators are expensive.
+An expression. The generator only runs if this evaluates to truthy (true or a number greater than zero). Always set a condition — generators are expensive.
 
 ```json
 { "condition": "sceneChanged" }

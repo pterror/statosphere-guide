@@ -2,7 +2,7 @@
 
 <div v-pre>
 
-A Statosphere config is a single JSON object with up to five arrays. Every array is optional — omit any section you do not need.
+Your config is one settings file that can have up to five sections. Every section is optional — omit any you do not need.
 
 ```json
 {
@@ -50,13 +50,15 @@ The key name is `content` (not `contentRules`) — that is the name the schema a
 
 See [Content Rules](./content-rules).
 
-## Expressions everywhere
+## Formulas everywhere
 
-Almost every field that is not a plain name or an enum value accepts an **expression** — a small formula in mathjs syntax. Expressions can reference your variables by name, do arithmetic, compare strings, and call built-in helpers.
+Almost every field that is not a plain name or a fixed choice (like a category name) accepts a **formula** — a small calculation that can reference your variables, do arithmetic, compare values, and call built-in helpers.
 
-See [Expressions](./expressions) for the full language reference.
+See [Expressions](./expressions) for the full reference.
 
 ## A skeleton config
+
+Each section is explained on its own page — use the sidebar to dive in. Here is what all five sections together look like:
 
 ```json
 {

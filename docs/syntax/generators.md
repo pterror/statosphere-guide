@@ -27,6 +27,8 @@ Generators are extra API calls. Each one adds latency and token cost. Use condit
 }
 ```
 
+`%` is the remainder operator — `turnCount % 5 == 0` means "every 5 turns" (when the turn number divides evenly by 5).
+
 ### Image generator
 
 ```json
@@ -73,7 +75,7 @@ An expression. The generator only runs if this evaluates to truthy. Always set a
 
 ### lazy
 
-Default: `false`. **Note: in the current release, `lazy` is stored but has no effect on execution.** The stage always waits for all generators to complete before returning a response, regardless of this flag. Setting `lazy: true` is a no-op until this is implemented. ([source](https://github.com/Lord-Raven/statosphere/blob/e67cd9ffaf1ee63e7b5c7bce11462516f547f5f7/src/Stage.tsx#L849-L851))
+Default: `false`. **Note: in the current release, this setting does not do anything yet — you can ignore it.** The stage always waits for all generators to complete before returning a response, regardless of this flag. ([source](https://github.com/Lord-Raven/statosphere/blob/e67cd9ffaf1ee63e7b5c7bce11462516f547f5f7/src/Stage.tsx#L849-L851))
 
 ### dependencies
 
@@ -127,7 +129,7 @@ A comma-delimited list of strings. If the LLM produces any of them, the response
 
 ### retryCondition
 
-Default: `""` (never retry, treated as `false`). If this expression evaluates to `true` after the generator runs, the generator retries. `{{content}}` is available. The stage will retry at most three times.
+Default: `""` (never retry, treated as `false`). If this formula evaluates to `true` after the generator runs, the generator retries. `{{content}}` is available here and refers to the generator's output — this is a special case where the generator's output becomes available as `{{content}}`, overriding the normal rule that template tags only appear inside strings. The stage will retry at most three times.
 
 ```json
 { "retryCondition": "isNull({{content}}) or {{content}} == \"\"" }
@@ -157,6 +159,10 @@ Valid values: `"21:9"`, `"16:9"`, `"3:2"`, `"5:4"`, `"1:1"`, `"4:5"`, `"2:3"`, `
 When `true`, attempts to remove the background from the generated image.
 
 ## Image-to-Image generator fields
+
+::: tip Advanced — skip if you're just getting started
+Image-to-Image generation is a specialized feature. The notes below and the known bug are only relevant if you are building bots that transform existing images.
+:::
 
 Image-to-Image generators take an existing image and transform it.
 

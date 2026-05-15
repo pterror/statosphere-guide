@@ -1,6 +1,6 @@
 # Introduction
 
-Statosphere is a Chub.ai stage extension that gives you tools to make your bots smarter and more reactive — without writing any code. You describe what you want in a JSON config file, and Statosphere handles the rest: reading the conversation, updating your variables, injecting instructions, and generating images or extra text.
+Statosphere is a Chub.ai stage extension that gives you tools to make your bots smarter and more reactive — without writing any code. You describe what you want in a settings file (called a JSON config file — more on that in the [Getting Started](./getting-started) guide), and Statosphere handles the rest: reading the conversation, updating your variables, injecting instructions, and generating images or extra text.
 
 ## What it lets you do
 
@@ -48,6 +48,6 @@ All five live in the same JSON config. You do not have to use all five — a sim
 
 - It only works on Chub.ai. Users on other frontends will not see any effects.
 - Its config is visible to users — any logic you build can be inspected.
-- Every zero-shot classifier call hits an external Hugging Face inference endpoint. If that endpoint is down, Statosphere falls back to a much smaller local model and results will be less accurate.
+- The auto-detection feature (classifiers) works by asking an outside server to read your messages. If that server is having a bad day, Statosphere switches to a backup that is less accurate — your bot will still work, but mood and action detection may miss more often.
 - Generators make additional LLM calls. Bots that use them will respond more slowly and cost more tokens.
 - Configuration changes do not appear to create a new version-history entry on Chub, so it is easy to accidentally overwrite your config with no easy undo.

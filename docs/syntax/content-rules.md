@@ -58,7 +58,7 @@ One of: `"Input"`, `"Post Input"`, `"Stage Direction"`, `"Response"`, `"Post Res
 
 ### condition
 
-An expression. The rule only applies if this evaluates to truthy. Omit or leave blank to always apply.
+A formula. The rule only applies if this evaluates to true (or a number greater than zero). Omit or leave blank to always apply.
 
 ```json
 { "condition": "mood == \"angry\"" }
@@ -81,7 +81,7 @@ If you omit `modification`, the default is `"{{content}}"` — meaning the conte
 
 ## How multiple matching rules interact
 
-Content rules run in the order they are defined. Each rule that matches sees the output of the previous rule as `{{content}}` (via `this.content`). ([source](https://github.com/Lord-Raven/statosphere/blob/e67cd9ffaf1ee63e7b5c7bce11462516f547f5f7/src/Stage.tsx#L860))
+Content rules run in the order they are defined. Each rule that matches sees the output of the previous rule as `{{content}}`. ([source](https://github.com/Lord-Raven/statosphere/blob/e67cd9ffaf1ee63e7b5c7bce11462516f547f5f7/src/Stage.tsx#L860))
 
 For **Stage Direction** and **Post Input** / **Post Response** categories, the content starts empty before that category's rules run. If each matching rule's `modification` uses `{{content}}` (e.g. `"{{content}}\nAnother note."`), the results accumulate. If a modification ignores `{{content}}` entirely (e.g. `"just this text"`), it replaces whatever came before. There is no automatic concatenation — you must use `{{content}}` in your modification to build on prior rules.
 
@@ -123,7 +123,7 @@ Only fires when `mood` is `"angry"`.
 }
 ```
 
-Removes any text in square brackets from what the bot receives. See the note about the `replace` bug in [Gotchas](../reference/gotchas) — if this does not work, use a custom function.
+Removes any text in square brackets from what the bot receives. **Note:** the built-in `replace()` has a known bug — this example may not work as written. See [Input Cleanup recipe](../recipes/input-cleanup) for a working approach using `split`/`join`, or see [Gotchas](../reference/gotchas).
 
 ### Add context text around the user's message
 

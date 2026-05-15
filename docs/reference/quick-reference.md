@@ -4,6 +4,8 @@
 
 A single-page cheat sheet of all field names, defaults, valid values, built-in functions, and template tags.
 
+**Types used in this table:** **number** = like `42`, **string** = text like `"hello"`, **boolean** = `true` or `false`, **array** = a list of values like `["a", "b", "c"]`.
+
 ## Top-level config keys
 
 | Key | Type | Description |

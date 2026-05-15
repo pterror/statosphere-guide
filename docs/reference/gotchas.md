@@ -61,9 +61,9 @@ This runs the generator only on the first turn where `myVariable` has not been s
 
 ## `/setVar` values are evaluated as expressions, not raw strings
 
-**Problem:** The value after `=` in `/setVar` is passed to `updateVariable`, which evaluates it as a mathjs expression. Writing `/setVar mood=happy` does not set `mood` to the string `"happy"` — it tries to evaluate the variable `happy`, which is likely `null` or undefined.
+**Problem:** The value after `=` in `/setVar` is evaluated as a formula. Writing `/setVar mood=happy` does not set `mood` to the word `happy` — it tries to look up a variable named `happy`, which likely does not exist and evaluates to null.
 
-**Fix:** Always wrap string values in quotes: `/setVar mood="happy"`. Numeric and boolean values do not need quotes.
+**Fix:** Always wrap string values in quotes: `/setVar mood="happy"`. Numbers and `true`/`false` do not need quotes.
 
 **Source:** ([Stage.tsx L831](https://github.com/Lord-Raven/statosphere/blob/e67cd9ffaf1ee63e7b5c7bce11462516f547f5f7/src/Stage.tsx#L831))
 

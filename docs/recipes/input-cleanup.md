@@ -2,9 +2,48 @@
 
 <div v-pre>
 
-Some users write out-of-character instructions alongside their in-character messages — things like `[make this more dramatic]` or `[respond in first person]`. This recipe strips those brackets from what the bot receives (keeping the chat clean) and moves the instruction into a hidden Stage Direction so the bot still acts on it.
+Some users write out-of-character instructions alongside their in-character messages — things like `[make this more dramatic]` or `respond in first person //`. This recipe strips that instruction from what the bot receives (keeping the chat clean) and moves it into a hidden Stage Direction so the bot still acts on it.
 
-## The config
+## Simple approach: split on a marker
+
+If you are happy with a specific marker — like `//` — this is the easiest version. No regex needed.
+
+```json
+{
+  "variables": [
+    { "name": "oocInstruction", "initialValue": "\"\"", "perTurnUpdate": "\"\"" }
+  ],
+  "content": [
+    {
+      "category": "Input",
+      "condition": "contains(\"{{content}}\", \"//\")",
+      "modification": "split(\"{{content}}\", \"//\")[0]"
+    },
+    {
+      "category": "Stage Direction",
+      "condition": "contains(\"{{content}}\", \"//\")",
+      "modification": "\"Author instruction: \" + split(\"{{content}}\", \"//\")[1]"
+    }
+  ]
+}
+```
+
+How it works:
+
+1. Both rules check whether the message contains `//`.
+2. The Input rule splits the message at `//` and sends only the first half to the bot.
+3. The Stage Direction rule takes the second half (the instruction) and injects it as a hidden author note.
+
+The user writes: `Let's go to the market // make the merchant suspicious`
+The bot sees: `Let's go to the market` plus a hidden note: `Author instruction: make the merchant suspicious`
+
+## Advanced version: square-bracket detection
+
+::: tip Advanced — skip if you're just getting started
+This version uses `capture()` to pull text out of `[brackets]` automatically. It is more flexible but also harder to read. Try the simple version above first.
+:::
+
+If your users write instructions in square brackets like `[make this more dramatic]`, this version detects them automatically via the classifier.
 
 ```json
 {
@@ -49,7 +88,7 @@ Some users write out-of-character instructions alongside their in-character mess
 }
 ```
 
-## How it works
+How it works:
 
 1. `oocInstruction` starts empty and resets to empty at the start of every turn via `perTurnUpdate`.
 
@@ -59,35 +98,9 @@ Some users write out-of-character instructions alongside their in-character mess
 
 4. The `Stage Direction` rule takes the captured instruction and injects it as an author's note — hidden from the chat history but visible to the bot.
 
-## Simpler approach: no regex
-
-If your use case is specific (e.g., users always write their instruction after a `//` marker), you can use `split` instead of `capture`:
-
-```json
-{
-  "variables": [
-    { "name": "oocInstruction", "initialValue": "\"\"", "perTurnUpdate": "\"\"" }
-  ],
-  "content": [
-    {
-      "category": "Input",
-      "condition": "contains(\"{{content}}\", \"//\")",
-      "modification": "split(\"{{content}}\", \"//\")[0]"
-    },
-    {
-      "category": "Stage Direction",
-      "condition": "contains(\"{{content}}\", \"//\")",
-      "modification": "\"Author instruction: \" + split(\"{{content}}\", \"//\")[1]"
-    }
-  ]
-}
-```
-
-This splits the message at `//` and sends the first half to the bot as the user's message, while the second half becomes a hidden stage direction.
-
 ## Important notes
 
-- The `replace` built-in has a known bug and may not work for regex-based stripping. The `split`/`join` approach in the simpler example avoids it entirely.
+- The `replace` built-in has a known bug and may not work for regex-based stripping. The `split`/`join` approach in both examples above avoids it entirely.
 - These rules only run on the current turn. Previous messages in the history are not affected.
 - If you want the bot to treat the instruction as very authoritative, consider using `"Post Input"` instead of `"Stage Direction"` to position it closer to the end of the prompt.
 

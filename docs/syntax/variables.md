@@ -2,7 +2,7 @@
 
 <div v-pre>
 
-Variables are the memory of your Statosphere config. They hold a value — a number, a string, a boolean — that persists from one message to the next. Classifiers and generators write to them; content rules and expressions read from them.
+Variables are the memory of your Statosphere config. They hold a value — a number (like `50`), a word or phrase (like `"happy"`, called a string), or a yes/no flag (`true` or `false`, called a boolean) — that is saved between messages. Classifiers and generators write to them; content rules and expressions read from them.
 
 ## Basic shape
 
@@ -19,7 +19,7 @@ That is a complete variable definition. `name` and `initialValue` are the only r
 
 ### name
 
-The identifier you use to reference this variable everywhere else in the config. Case-insensitive when used in expressions and template tags, but it is good practice to be consistent.
+The identifier you use to reference this variable everywhere else in the config. Uppercase and lowercase do not matter — `HP` and `hp` both work — but it is good practice to be consistent.
 
 Use simple names without spaces: `hp`, `mood`, `turnCount`, `currentScene`.
 
@@ -33,11 +33,13 @@ An **expression** evaluated once when the stage loads. The result becomes the va
 { "name": "sceneChanged", "initialValue": "false" }
 ```
 
-Notice that string values need to be wrapped in quotes *inside* the expression string. `"neutral"` as a JSON string would be the variable name `neutral`; `"\"neutral\""` evaluates to the string `"neutral"`.
+Here is the one tricky thing about starting a variable with a word value: you need quotes inside quotes. `"\"neutral\""` looks weird, but think of it this way — the outer quotes are required by the settings file format, and the inner `\"` marks tell the formula parser "this is a word, not a variable name." Just copy the pattern: `"\"your word here\""`.
+
+> **Why does this matter?** Without the inner quotes, the formula parser treats `neutral` as a variable name and looks it up — not the string you wanted.
 
 ### Update phases
 
-Variables can have up to four update formulas, each running at a different point in the conversation turn:
+Most of the time you will use `perTurnUpdate` — it runs at the start of each turn, before any classifiers have read the new message. The others exist for more advanced timing needs.
 
 | Field | When it runs |
 |---|---|
@@ -46,7 +48,7 @@ Variables can have up to four update formulas, each running at a different point
 | `preResponseUpdate` | Immediately when the bot's reply arrives, before response classifiers run |
 | `postResponseUpdate` | After response classifiers have run |
 
-Each field is an expression whose result replaces the variable's current value. Leave a field blank (or omit it) and the variable is not updated at that phase.
+Each field is a formula whose result replaces the variable's current value. Leave a field blank (or omit it) and the variable is not updated at that phase.
 
 ## Turn order diagram
 
@@ -67,11 +69,11 @@ User sends message
 
 Stage Direction content rules are evaluated **before** the bot replies (in the same `beforePrompt` pass as Input rules), not after. See [Turn Order](../special/turn-order) for the full step-by-step breakdown.
 
-## Constants vs. tracked variables
+## Saved vs. reset-each-load variables
 
-A variable is treated as a constant — not persisted to chat state — if it has no update formulas (`perTurnUpdate`, `postInputUpdate`, `preResponseUpdate`, `postResponseUpdate`) and is not the target of any classifier or generator `updates` block. ([source](https://github.com/Lord-Raven/statosphere/blob/e67cd9ffaf1ee63e7b5c7bce11462516f547f5f7/src/Variable.tsx#L19))
+A variable is **saved between messages** (and across page reloads) if it has an update formula or is written to by a classifier or generator. Statosphere detects this automatically at load time — you do not need to do anything special. ([source](https://github.com/Lord-Raven/statosphere/blob/e67cd9ffaf1ee63e7b5c7bce11462516f547f5f7/src/Stage.tsx#L272-L304))
 
-Statosphere automatically marks a variable as non-constant (and therefore persisted) when it detects at load time that a classifier or generator writes to it. ([source](https://github.com/Lord-Raven/statosphere/blob/e67cd9ffaf1ee63e7b5c7bce11462516f547f5f7/src/Stage.tsx#L272-L304)) You do not need to do anything special to make this happen.
+A variable that has no update formulas *and* is never written to by a classifier or generator is treated as a constant — it resets to `initialValue` every time the page loads. ([source](https://github.com/Lord-Raven/statosphere/blob/e67cd9ffaf1ee63e7b5c7bce11462516f547f5f7/src/Variable.tsx#L19)) This is fine for fixed values like `max_hp`; it is a problem if you expected a variable to keep its value and it is not being updated anywhere.
 
 ## Examples
 
@@ -105,6 +107,8 @@ Statosphere automatically marks a variable as non-constant (and therefore persis
   "postResponseUpdate": "hp < 25 ? \"critical\" : hp < 60 ? \"hurt\" : \"fine\""
 }
 ```
+
+The `?` and `:` symbols make a choice: if the condition before `?` is true, use the first option; otherwise use the second. Nested, this reads: "if HP is below 25 say 'critical'; if HP is below 60 say 'hurt'; otherwise say 'fine'."
 
 This re-derives `hpStatus` from `hp` after every response, so it always stays in sync. You can then use `hpStatus` in content rules without repeating the threshold logic.
 

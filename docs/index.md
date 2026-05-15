@@ -4,7 +4,7 @@ layout: home
 hero:
   name: Statosphere Guide
   text: Variables, classifiers, and generators for your Chub.ai bots — no code required.
-  tagline: An unofficial guide to Lord-Raven's Statosphere stage. Add stat tracking, behavior rules, image generation, and more to any Chub.ai bot through simple JSON config.
+  tagline: An unofficial guide to Lord-Raven's Statosphere stage. Add stat tracking, behavior rules, image generation, and more to any Chub.ai bot through a simple settings file.
   actions:
     - theme: brand
       text: Get Started
@@ -27,7 +27,7 @@ features:
     details: Rewrite the user's message before the bot sees it, inject hidden instructions, or filter the bot's reply before it appears in chat — all driven by your variables.
     link: /syntax/content-rules
   - title: Expressions
-    details: Every formula field accepts a small expression language (mathjs) with arithmetic, comparisons, string operations, and Statosphere's own helpers like contains() and capture().
+    details: Formulas that control when things happen — like "only fire if HP drops below 25" or "add the character's name to the message."
     link: /syntax/expressions
 ---
 

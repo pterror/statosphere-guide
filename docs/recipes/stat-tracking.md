@@ -62,6 +62,8 @@ This recipe tracks a character's hit points across the conversation. A classifie
 3. The `max()` and `min()` calls prevent HP from going below 0 or above `max_hp`.
 4. A Stage Direction tells the bot the current HP and an automatic status label on every turn.
 
+The Stage Direction formula uses nested ternary choices (`? :`): "if HP is below 15 say 'critically injured'; if HP is below 30 say 'hurt'; otherwise say 'in reasonable shape'." To change the thresholds, edit the `15` and `30` values in the `modification` field.
+
 ## Extending it
 
 - Add more classifier labels: `"dying"` (below 5 HP), `"unconscious"`, `"dead"`.

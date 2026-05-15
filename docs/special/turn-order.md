@@ -16,7 +16,7 @@ This page describes exactly when each part of your Statosphere config runs durin
    (Use this for things that should reset or advance each turn)
 
 2. Input classifiers and "On Input" generators run
-   (Read the user's message; update variables; busy-wait until all complete)
+   (Read the user's message; update variables; Statosphere pauses here and waits for them to finish before moving on)
 
 3. postInputUpdate runs on all variables
    (Use this for derived values that depend on input classifier results)
@@ -44,7 +44,7 @@ This page describes exactly when each part of your Statosphere config runs durin
    (Use this for things that should update when a reply arrives)
 
 8. Response classifiers and "On Response" generators run
-   (Read the bot's reply; update variables; busy-wait until all complete)
+   (Read the bot's reply; update variables; Statosphere pauses here and waits for them to finish before moving on)
 
 9. postResponseUpdate runs on all variables
    (Use this for derived values that depend on response classifier results)
@@ -88,7 +88,7 @@ If you use a response classifier to detect something in the bot's reply and then
 
 ### Generators and their phases
 
-Generators and classifiers share the same busy-wait loop (`processRequests`). ([source](https://github.com/Lord-Raven/statosphere/blob/e67cd9ffaf1ee63e7b5c7bce11462516f547f5f7/src/Stage.tsx#L468-L521)) They run concurrently (each fires its async request when its dependencies are met) and the loop polls every 500 ms until all are done.
+Generators and classifiers share the same processing loop (`processRequests`). ([source](https://github.com/Lord-Raven/statosphere/blob/e67cd9ffaf1ee63e7b5c7bce11462516f547f5f7/src/Stage.tsx#L468-L521)) Statosphere fires all of them at once and waits until every one finishes before moving on — so they do not slow each other down, but they all have to complete before your bot replies.
 
 - `"On Input"` generators and input classifiers run together in step 2 — before content rules.
 - `"On Response"` generators and response classifiers run together in step 8 — before response content rules.

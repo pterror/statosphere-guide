@@ -28,7 +28,7 @@ The name you use to call this function in expressions. Pick something descriptiv
 
 ### parameters
 
-A comma-separated list of parameter names. These are the local variables available inside the function body. Parameters can shadow global variable names within the function.
+A comma-separated list of parameter names. These are the local variables available inside the function body. If a parameter has the same name as one of your config variables, the parameter takes priority inside the function — the global variable is not visible there.
 
 ```
 "parameters": "value, lo, hi"
@@ -46,7 +46,7 @@ A single mathjs expression. The value it evaluates to is what the function retur
 { "body": "a + b" }
 ```
 
-The body is a **mathjs expression**, not a JavaScript statement. You cannot use `return`, `if/else` blocks, or multiple lines. Use the ternary operator (`? :`) for conditionals.
+Write one formula. It can use `?` and `:` for choices (see [Expressions](./expressions#conditionals-ternary)). The result of that formula is what the function gives back. You cannot use `return`, `if/else` blocks, or multiple lines — it is a single calculation, not a script.
 
 ## When to use a custom function
 

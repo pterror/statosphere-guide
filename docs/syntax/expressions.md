@@ -2,21 +2,31 @@
 
 <div v-pre>
 
-Almost every formula field in Statosphere — variable updates, classifier conditions, generator conditions, content rule conditions and modifications — accepts an **expression**. Expressions are evaluated using [mathjs](https://mathjs.org/), a JavaScript math library with a friendly syntax.
+Almost every formula field in Statosphere — variable updates, classifier conditions, generator conditions, content rule conditions and modifications — accepts an **expression** (a formula). Expressions are evaluated using [mathjs](https://mathjs.org/), a JavaScript math library with a friendly syntax.
 
-This page covers everything you need to write useful expressions: literals, operators, variables, string handling, Statosphere's built-in helpers, and template tags.
+This page covers everything you need to write useful expressions: values, operators, variables, string handling, Statosphere's built-in helpers, and template tags.
 
-## Literals
+::: info Types used in this guide
+- **number** — a numeric value like `42` or `3.14`
+- **string** — a word or phrase in double quotes like `"happy"` or `"the dungeon"`
+- **boolean** — a yes/no flag: `true` or `false`
+- **array** — a list of values like `["a", "b", "c"]` (used by `split` and `capture`)
+- **truthy** — true, or any number greater than zero (conditions check for this)
+:::
+
+## Basic values you can type
+
+Statosphere formulas work with three kinds of values: numbers, words/text in quotes (called strings), and yes/no flags (called booleans).
 
 ```
 42          a number
-3.14        a decimal
-true        boolean true
-false       boolean false
-"hello"     a string (double quotes)
+3.14        a decimal number
+true        boolean true (yes)
+false       boolean false (no)
+"hello"     a string — text in double quotes
 ```
 
-Single quotes do not work for strings in mathjs. Always use double quotes.
+Always use double quotes for strings — single quotes do not work in mathjs.
 
 ## Arithmetic
 
@@ -52,16 +62,24 @@ Use the words `and`, `or`, `not` — not `&&`, `||`, `!`.
 
 ## Conditionals (ternary)
 
+::: tip Advanced — skip if you're just getting started
+Ternaries are powerful but can look intimidating at first. Come back to this section once you have a working config.
+:::
+
 ```
 hp < 25 ? "critical" : "fine"
 turnCount > 5 ? "late" : "early"
 ```
+
+The `?` and `:` symbols make a choice: if the condition before `?` is true, use the first option; otherwise use the second. The example above means: "if HP is below 25 say 'critical', otherwise say 'fine'."
 
 The syntax is `condition ? valueIfTrue : valueIfFalse`. You can nest them:
 
 ```
 hp < 10 ? "dying" : hp < 50 ? "hurt" : "fine"
 ```
+
+This reads: "if HP is below 10 say 'dying'; if HP is below 50 say 'hurt'; otherwise say 'fine'."
 
 ## Referencing variables
 
@@ -109,6 +127,10 @@ contains(items, "sword")         → true only if items includes exactly "sword"
 ```
 
 ### capture(string, regex, regexFlags)
+
+::: tip Advanced — skip if you're just getting started
+`capture()` uses regular expressions, which are a specialist text-matching tool. If you do not need to extract exact text from a message, skip ahead.
+:::
 
 Returns all capture groups from all matches as an array, or an empty array if no match. The third argument `regexFlags` is optional; it defaults to `"g"` (global match). ([source](https://github.com/Lord-Raven/statosphere/blob/e67cd9ffaf1ee63e7b5c7bce11462516f547f5f7/src/Stage.tsx#L151-L154))
 
@@ -214,17 +236,23 @@ Any variable name works as a tag:
 
 ### Where tags can appear
 
-Tags are only expanded inside string literals. They do **not** work as bare variable references.
+Tags only work **inside quoted strings**. They do not work on their own.
 
 ```
 "HP is {{hp}}"      ✓  works — tag inside a string
-hp                  ✓  works — direct variable reference
+hp                  ✓  works — direct variable reference (no quotes needed)
 {{hp}}              ✗  does not work outside a string
 ```
 
-### Tag regex and character set
+In other words: if you want to do math with `hp`, just write `hp` (no braces). If you want to drop the value of `hp` into a sentence, write `"...{{hp}}..."` inside quotes.
 
-The tag substitution regex is `{{([A-z]*)}}` ([source](https://github.com/Lord-Raven/statosphere/blob/e67cd9ffaf1ee63e7b5c7bce11462516f547f5f7/src/Stage.tsx#L695)). The `A-z` range in ASCII includes not just letters but also `[`, `\`, `]`, `^`, `_`, and `` ` `` (characters between `Z` and `a`). Variable names should stick to letters, digits, and underscores to avoid ambiguity.
+### Tag character set — what to name your variables
+
+Stick to plain letters, digits, and underscores in variable names — like `hp`, `turnCount`, `currentMood`. These always work reliably as template tags.
+
+::: details Implementation note
+The tag substitution regex is `{{([A-z]*)}}` ([source](https://github.com/Lord-Raven/statosphere/blob/e67cd9ffaf1ee63e7b5c7bce11462516f547f5f7/src/Stage.tsx#L695)). The `A-z` range in ASCII technically includes `[`, `\`, `]`, `^`, `_`, and `` ` `` as well as letters. Sticking to letters, digits, and underscores avoids any edge cases.
+:::
 
 ### Double-quote escaping
 

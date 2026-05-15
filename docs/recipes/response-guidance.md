@@ -14,6 +14,10 @@ It also demonstrates dynamic response guidance: reading what the *user* is doing
     {
       "name": "userAction",
       "initialValue": "\"talking\""
+    },
+    {
+      "name": "driftDetected",
+      "initialValue": "false"
     }
   ],
   "classifiers": [
@@ -92,7 +96,7 @@ It also demonstrates dynamic response guidance: reading what the *user* is doing
 
 2. Four Stage Direction rules each fire for a different `userAction` value, giving the bot a specific writing instruction tailored to what the user is doing.
 
-3. `CharacterDrift` reads the *bot's* response (note `responseTemplate`) and flags whether it sounds out of character. If so, `driftDetected` is set to `true`.
+3. `CharacterDrift` reads the *bot's* response (note `responseTemplate`) and flags whether it sounds out of character. If so, `driftDetected` is set to `true`. (Statosphere auto-creates variables that classifiers write to, but declaring `driftDetected` explicitly in `variables` as shown above is good practice — it makes the config easier to read.)
 
 4. A final Stage Direction fires when `driftDetected` is true, reminding the bot to stay in character. This fires on the *next* turn after drift was detected — Statosphere cannot modify the response that was already generated.
 

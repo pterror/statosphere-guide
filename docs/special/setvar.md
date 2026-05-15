@@ -22,7 +22,7 @@ The `/setVar` commands are stripped before the message reaches the bot. The bot 
 
 ## Case sensitivity
 
-The command keyword is case-insensitive: `/setVar`, `/setvar`, `/SETVAR` all work. The regex used is `/\/setvar\s+([A-Za-z_][A-Za-z0-9_]*)\s*=\s*([^\n\r]+)/gi` (the `i` flag). ([source](https://github.com/Lord-Raven/statosphere/blob/e67cd9ffaf1ee63e7b5c7bce11462516f547f5f7/src/Stage.tsx#L824))
+The command keyword is case-insensitive: `/setVar`, `/setvar`, and `/SETVAR` all work. ([source](https://github.com/Lord-Raven/statosphere/blob/e67cd9ffaf1ee63e7b5c7bce11462516f547f5f7/src/Stage.tsx#L824))
 
 Variable names follow the same case rules as everywhere else in Statosphere.
 

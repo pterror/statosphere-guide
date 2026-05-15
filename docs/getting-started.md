@@ -11,6 +11,10 @@ Statosphere needs to be added before it does anything. You have two options:
 
 The creator recommends testing in a specific chat first before applying to a public bot.
 
+## What a settings file looks like
+
+Statosphere is controlled by a settings file in JSON format. JSON looks like this: field names on the left in quotes, their values on the right. You do not need to write it by hand — the visual editor (below) builds it for you. What matters is knowing that the "Configuration" field in Statosphere expects this kind of text when you paste your settings in.
+
 ## Step 2: Open the config editor
 
 Statosphere does nothing without configuration. Rather than handwriting JSON, use the official external editor:
@@ -80,7 +84,7 @@ Here is a complete config you could paste right now. It tracks a `mood` variable
 What this does:
 - Starts with `mood = "neutral"`.
 - After each user message, the classifier checks whether it sounds positive or negative.
-- Whichever label wins (above threshold 0.6) sets `mood` to the matching string.
+- Whichever label wins (above `threshold: 0.6` — meaning the classifier needs to be at least 60% confident) sets `mood` to the matching string.
 - A Stage Direction injects the current mood as a hidden instruction before the bot replies.
 
 ## Editing an existing config
@@ -89,6 +93,8 @@ Drop your current config JSON back into the editor to modify it, then copy and r
 
 ## Debugging
 
-Open your browser's developer console (F12 → Console tab) after refreshing. Statosphere logs a lot there, including what it loaded, what classifiers fired, and any errors. See [Debug Mode](./special/debug-mode) for how to get even more output.
+If something is not working, open your browser's developer console: press **F12**, then click the **Console** tab at the top of the panel that appears. Look for any red error messages — those will tell you if your config has a problem. Statosphere also logs what it loaded, what classifiers fired, and what values your variables have after each turn.
+
+See [Debug Mode](./special/debug-mode) for more detail on reading the console output.
 
 </div>

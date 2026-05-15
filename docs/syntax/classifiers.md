@@ -4,7 +4,9 @@
 
 Classifiers watch what is said and translate it into variable updates. You describe what you are looking for — "this message implies the user is attacking" — and the classifier decides whether that description fits, then writes to your variables if it does.
 
-Under the hood, classifiers use a zero-shot NLP model hosted on Hugging Face. You do not train anything; you just write the descriptions.
+::: details How it works under the hood
+Classifiers use a zero-shot NLP model hosted on Hugging Face. You do not train anything; you just write the descriptions. If that external service is unavailable, Statosphere falls back to a smaller local model — see [Introduction](../introduction) for more on what that means in practice.
+:::
 
 ## What a classifier does
 
@@ -46,7 +48,7 @@ A label for the classifier, used in logs and as a dependency reference. Must be 
 
 ### condition
 
-An expression. The classifier only runs if this evaluates to truthy. Omit or leave blank to always run.
+A formula. The classifier only runs if this evaluates to true (or a number greater than zero). Omit or leave blank to always run.
 
 Classifiers are network calls, so adding a condition to avoid unnecessary ones is good practice.
 
@@ -67,7 +69,7 @@ You can set both — the classifier runs twice, once on input and once on respon
 
 ### inputHypothesis
 
-The hypothesis template for input classification. The `{}` placeholder is replaced with each label in turn.
+The hypothesis template for input classification. The `{}` placeholder (notice: **single** curly braces, not `{{content}}`) is replaced with each label word in turn. This is different from `{{content}}` — `{}` is where the label gets plugged in; `{{content}}` is a template tag for message text.
 
 ```json
 { "inputHypothesis": "This message expresses {} sentiment." }
@@ -94,6 +96,8 @@ Default: `0` (use preset size). Only relevant when `useHistory` is `true`. Set a
 
 A comma-separated list of classifier or generator names that must complete before this classifier runs. Useful for ordering when one classifier's updates affect another's condition.
 
+Most beginners will not need this field.
+
 ## The classifications array
 
 Each entry in `classifications` is a label to test.
@@ -110,7 +114,7 @@ The word or phrase substituted into `{}` in the hypothesis template. This is wha
 
 ### condition
 
-An expression. This label is only included in the classification task if this evaluates to truthy. Use this to remove irrelevant labels and make the model's job easier (and faster).
+A formula. This label is only included in the classification task if this evaluates to true (or a number greater than zero). Use this to remove irrelevant labels and make the model's job easier (and faster).
 
 ```json
 { "condition": "inCombat" }
@@ -138,7 +142,11 @@ The minimum score (0–1) for this label's updates to be applied. [Default: 0.7]
 
 ### dynamic
 
-Default: `false`. When `true`, the `label` field is an **expression** that evaluates to a string or an array of strings — generating multiple labels at runtime. Useful when your label list comes from a variable.
+::: tip Advanced — skip if you're just getting started
+This field is for cases where you do not know your label list ahead of time.
+:::
+
+Default: `false`. When `true`, the `label` field is a **formula** that evaluates to a string or an array of strings — generating multiple labels at runtime. Useful when your label list comes from a variable.
 
 ```json
 {

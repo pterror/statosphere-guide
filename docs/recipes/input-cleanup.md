@@ -100,6 +100,7 @@ This splits the message at `//` and sends the first half to the bot as the user'
 ## Important notes
 
 - The `replace` built-in has a known bug and may not work for regex-based stripping. The `split`/`join` approach in the simpler example avoids it entirely.
+- The built-in `capture()` returns an **array of arrays** (one sub-array per match, containing its capture groups), not a plain string. ([source](https://github.com/Lord-Raven/statosphere/blob/e67cd9ffaf1ee63e7b5c7bce11462516f547f5f7/src/Stage.tsx#L151-L154)) The complex OOC example above stores `capture(...)` into `oocInstruction`, which will be `[["the text"]]` rather than `"the text"`. Code that then does string operations on `oocInstruction` may produce `"[object Array]"` rather than the intended value. For reliable extraction of a single capture group, access `capture(...)[0][0]` in your custom function or update formula.
 - These rules only run on the current turn. Previous messages in the history are not affected.
 - If you want the bot to treat the instruction as very authoritative, consider using `"Post Input"` instead of `"Stage Direction"` to position it closer to the end of the prompt.
 

@@ -4,6 +4,16 @@
 
 Known issues and non-obvious behaviors that affect people writing Statosphere configs.
 
+## The `lazy` field has no effect
+
+**Problem:** Generators have a `lazy` field described as making a generator run without holding up the chat. In the current release, this field is stored but never checked in the execution loop. All generators block the response regardless of `lazy: true`.
+
+**Workaround:** There is no workaround for true background generation. Do not rely on `lazy` to reduce latency.
+
+**Source:** `lazy` is set in `Generator.tsx` but absent from all conditional logic in `Stage.tsx` at commit `e67cd9f`. ([source](https://github.com/Lord-Raven/statosphere/blob/e67cd9ffaf1ee63e7b5c7bce11462516f547f5f7/src/Stage.tsx#L849-L851))
+
+---
+
 ## The imageToImageType typo
 
 **Problem:** In Image-to-Image generators, the field should be `imageToImageType`, but the source code reads from a misspelled key `iamgeToImageType`. Setting `imageToImageType` to `"canny"` or `"face"` has no effect — the stage always gets `undefined` and defaults to `"edit"`.
@@ -32,9 +42,9 @@ This treats `pattern` as a literal string (not a regex), but it works reliably f
 
 ---
 
-## The "Initialization" phase does not run
+## The "Initialization" phase does not exist
 
-**Problem:** The generator schema includes an `"Initialization"` option for the `phase` field, suggesting generators can run when the stage first loads. In the current release, this phase does not actually trigger.
+**Problem:** Some earlier documentation or creator notes referenced an `"Initialization"` phase for generators. This phase is not present in the current schema ([source](https://github.com/Lord-Raven/statosphere/blob/e67cd9ffaf1ee63e7b5c7bce11462516f547f5f7/src/assets/generator-schema.json)) and the code never triggers initialization-phase generators.
 
 **Workaround:** Use `"On Input"` with a condition that fires only when the variable you want to initialize is null:
 
@@ -46,6 +56,16 @@ This treats `pattern` as a literal string (not a regex), but it works reliably f
 ```
 
 This runs the generator only on the first turn where `myVariable` has not been set yet, effectively initializing it.
+
+---
+
+## `/setVar` values are evaluated as expressions, not raw strings
+
+**Problem:** The value after `=` in `/setVar` is passed to `updateVariable`, which evaluates it as a mathjs expression. Writing `/setVar mood=happy` does not set `mood` to the string `"happy"` — it tries to evaluate the variable `happy`, which is likely `null` or undefined.
+
+**Fix:** Always wrap string values in quotes: `/setVar mood="happy"`. Numeric and boolean values do not need quotes.
+
+**Source:** ([Stage.tsx L831](https://github.com/Lord-Raven/statosphere/blob/e67cd9ffaf1ee63e7b5c7bce11462516f547f5f7/src/Stage.tsx#L831))
 
 ---
 
@@ -93,9 +113,9 @@ Writing `"initialValue": "neutral"` makes the expression parser look for a varia
 
 ## Variables referenced by classifiers or generators are auto-persisted
 
-Variables that appear in classifier or generator `updates` blocks are automatically saved to chat state. Variables that only have an `initialValue` with no updates (and are never written to by a classifier or generator) are not persisted — they reset to `initialValue` on every page load.
+At load time, Statosphere scans every classifier and generator `updates` block and marks the target variables as non-constant. ([source](https://github.com/Lord-Raven/statosphere/blob/e67cd9ffaf1ee63e7b5c7bce11462516f547f5f7/src/Stage.tsx#L272-L304)) Non-constant variables are saved to chat state between turns; constant variables (those with no update formulas and no classifier/generator writes) reset to `initialValue` on every page load.
 
-This is intentional behavior for constants. But if you expect a variable to keep its value across sessions and it is not being updated anywhere, check whether it is actually being written.
+If you expect a variable to keep its value across sessions and it is not being updated anywhere, check whether it is actually being written by a classifier or generator `updates` block, or has at least one update formula.
 
 ---
 

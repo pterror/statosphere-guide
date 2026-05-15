@@ -79,9 +79,13 @@ Use `{{content}}` to embed the current content in your modification, rather than
 
 If you omit `modification`, the default is `"{{content}}"` — meaning the content is unchanged (the rule fires but has no effect). You probably always want to set this.
 
-## Content rules are additive for some categories
+## How multiple matching rules interact
 
-For Stage Direction and system message categories, multiple matching rules are concatenated — all of them apply. For Input and Response, the last matching rule wins (each one replaces the previous result).
+Content rules run in the order they are defined. Each rule that matches sees the output of the previous rule as `{{content}}` (via `this.content`). ([source](https://github.com/Lord-Raven/statosphere/blob/e67cd9ffaf1ee63e7b5c7bce11462516f547f5f7/src/Stage.tsx#L860))
+
+For **Stage Direction** and **Post Input** / **Post Response** categories, the content starts empty before that category's rules run. If each matching rule's `modification` uses `{{content}}` (e.g. `"{{content}}\nAnother note."`), the results accumulate. If a modification ignores `{{content}}` entirely (e.g. `"just this text"`), it replaces whatever came before. There is no automatic concatenation — you must use `{{content}}` in your modification to build on prior rules.
+
+For **Input** and **Response** categories, the same rule applies: each rule's modification can build on or replace the previous output depending on whether it references `{{content}}`.
 
 ## Worked examples
 

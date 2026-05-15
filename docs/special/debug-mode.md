@@ -2,7 +2,9 @@
 
 <div v-pre>
 
-Statosphere writes diagnostic output to the browser's developer console. This output is always present to some degree, but you can get more of it by enabling debug mode.
+Statosphere writes diagnostic output to the browser's developer console throughout its operation. This output is always on — the stage uses `console.log` liberally regardless of any setting.
+
+The `debugMode` variable is recognized and stored by the stage ([source](https://github.com/Lord-Raven/statosphere/blob/e67cd9ffaf1ee63e7b5c7bce11462516f547f5f7/src/Stage.tsx#L313-L316)), but in the current release the internal `debugMode` flag is never checked to gate additional output. Console logging behavior is identical whether `debugMode` is set or not. The variable's main value is as a **convention** — it signals to you (as the botmaker) that you are in a testing configuration.
 
 ## How to enable it
 

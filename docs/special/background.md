@@ -64,7 +64,8 @@ This is useful for testing image URLs before wiring up a generator.
 
 ## Notes
 
-- The variable must be named exactly `background` (case-insensitive).
+- The variable must be named exactly `background` (case-sensitive — lowercase). The check reads `this.scope.background` directly. ([source](https://github.com/Lord-Raven/statosphere/blob/e67cd9ffaf1ee63e7b5c7bce11462516f547f5f7/src/Stage.tsx#L349-L355))
+- The value passed to `updateEnvironment` is the variable's value, or an empty string if the variable is unset.
 - If the URL is invalid or the image fails to load, the background reverts to default. No error appears in the chat.
 - The background changes on the turn when the variable is updated — not retroactively for prior messages.
 

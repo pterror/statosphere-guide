@@ -52,24 +52,26 @@ Each field is an expression whose result replaces the variable's current value. 
 
 ```
 User sends message
+  └─ /setVar commands processed (before any variable updates)
   └─ perTurnUpdate runs on all variables
   └─ Input classifiers run
   └─ postInputUpdate runs on all variables
-  └─ Content rules for Input / Post Input apply
+  └─ Content rules for Input / Post Input / Stage Direction apply
   └─ Bot generates reply
   └─ preResponseUpdate runs on all variables
   └─ Response classifiers run
   └─ postResponseUpdate runs on all variables
   └─ Content rules for Response / Post Response apply
-  └─ Stage Direction and system message content rules apply
   └─ Reply displayed to user
 ```
 
+Stage Direction content rules are evaluated **before** the bot replies (in the same `beforePrompt` pass as Input rules), not after. See [Turn Order](../special/turn-order) for the full step-by-step breakdown.
+
 ## Constants vs. tracked variables
 
-If a variable has no update formulas and is never written to by a classifier or generator, it acts as a constant — useful for thresholds and config values you want to name rather than hard-code.
+A variable is treated as a constant — not persisted to chat state — if it has no update formulas (`perTurnUpdate`, `postInputUpdate`, `preResponseUpdate`, `postResponseUpdate`) and is not the target of any classifier or generator `updates` block. ([source](https://github.com/Lord-Raven/statosphere/blob/e67cd9ffaf1ee63e7b5c7bce11462516f547f5f7/src/Variable.tsx#L19))
 
-Variables that *are* written by classifiers or generators are automatically persisted in chat state. You do not need to do anything special to make this happen.
+Statosphere automatically marks a variable as non-constant (and therefore persisted) when it detects at load time that a classifier or generator writes to it. ([source](https://github.com/Lord-Raven/statosphere/blob/e67cd9ffaf1ee63e7b5c7bce11462516f547f5f7/src/Stage.tsx#L272-L304)) You do not need to do anything special to make this happen.
 
 ## Examples
 

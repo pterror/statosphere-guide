@@ -67,7 +67,7 @@ A single-page cheat sheet of all field names, defaults, valid values, built-in f
 | `type` | no | `"Text"` | `"Text"`, `"Image"`, or `"Image-to-Image"` |
 | `phase` | yes | — | `"On Input"` or `"On Response"` |
 | `condition` | no | (always) | Expression; generator skipped if falsy |
-| `lazy` | no | `false` | Fire without holding up the chat |
+| `lazy` | no | `false` | Stored but currently has no effect — stage always waits for all generators |
 | `prompt` | no | — | Expression for the generation prompt |
 | `dependencies` | no | (none) | Comma-separated names that must run first |
 | `updates` | no | [] | Array of `{variable, setTo}` updates; `{{content}}` = result |
@@ -117,7 +117,7 @@ A single-page cheat sheet of all field names, defaults, valid values, built-in f
 |----------|---------|-------|
 | `split(string, separator)` | array | Splits string by separator |
 | `contains(haystack, needle)` | boolean | Works for strings and arrays |
-| `capture(string, regex)` | string or null | First capture group; JS regex syntax |
+| `capture(string, regex, regexFlags?)` | array | All capture groups of all matches; optional flags (default `"g"`) |
 | `replace(input, regex, newValue)` | string | Has a bug — see [Gotchas](./gotchas) |
 | `join(array, separator)` | string | Joins array elements |
 | `substring(string, start, end)` | string | Zero-based, end exclusive |

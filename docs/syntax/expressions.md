@@ -101,23 +101,26 @@ split(itemList, "|")
 
 ### contains(haystack, needle)
 
-Returns `true` if `haystack` contains `needle`. Works for strings (substring check) and arrays (element check).
+Returns `true` if `haystack` contains `needle`. Works for strings (substring check, **case-insensitive**) and arrays (element check, case-sensitive). ([source](https://github.com/Lord-Raven/statosphere/blob/e67cd9ffaf1ee63e7b5c7bce11462516f547f5f7/src/Stage.tsx#L145-L149))
 
 ```
-contains(mood, "angry")          → true if mood contains the word "angry"
-contains(items, "sword")         → true if the items array includes "sword"
+contains(mood, "Angry")          → true if mood contains "angry" (any case)
+contains(items, "sword")         → true only if items includes exactly "sword"
 ```
 
-### capture(string, regex)
+### capture(string, regex, regexFlags)
 
-Returns the first capture group from a JavaScript regex match, or `null` if no match.
+Returns all capture groups from all matches as an array, or an empty array if no match. The third argument `regexFlags` is optional; it defaults to `"g"` (global match). ([source](https://github.com/Lord-Raven/statosphere/blob/e67cd9ffaf1ee63e7b5c7bce11462516f547f5f7/src/Stage.tsx#L151-L154))
 
 ```
-capture(content, "HP: (\\d+)")   → "42" if content contains "HP: 42"
-capture(message, "feeling (\\w+)")
+capture(content, "HP: (\\d+)")       → [["42"]] if content contains "HP: 42"
+capture(message, "feeling (\\w+)")   → [["happy"]] if message contains "feeling happy"
+capture(text, "(\\w+)=(\\w+)", "g")  → [["a","1"],["b","2"]] for "a=1 b=2"
 ```
 
-The regex is a JavaScript regex string. Use `\\d` for a digit, `\\w` for a word character, etc. Flags are not supported in this form.
+Each element of the returned array is the array of capture groups for one match. If you want a single string, access `capture(...)[0][0]`.
+
+The regex is a JavaScript regex string. Use `\\d` for a digit, `\\w` for a word character, etc.
 
 ### replace(input, regex, newValue)
 
@@ -218,6 +221,14 @@ Tags are only expanded inside string literals. They do **not** work as bare vari
 hp                  ✓  works — direct variable reference
 {{hp}}              ✗  does not work outside a string
 ```
+
+### Tag regex and character set
+
+The tag substitution regex is `{{([A-z]*)}}` ([source](https://github.com/Lord-Raven/statosphere/blob/e67cd9ffaf1ee63e7b5c7bce11462516f547f5f7/src/Stage.tsx#L695)). The `A-z` range in ASCII includes not just letters but also `[`, `\`, `]`, `^`, `_`, and `` ` `` (characters between `Z` and `a`). Variable names should stick to letters, digits, and underscores to avoid ambiguity.
+
+### Double-quote escaping
+
+Before a tag value is substituted into an expression string, any `"` characters in the value are escaped to `\"`. ([source](https://github.com/Lord-Raven/statosphere/blob/e67cd9ffaf1ee63e7b5c7bce11462516f547f5f7/src/Stage.tsx#L692)) This prevents the value from breaking the surrounding string literal, but it means tag values are always inserted as part of a quoted string — you cannot use a tag to inject raw expression syntax.
 
 ### Example: a Stage Direction that uses both
 

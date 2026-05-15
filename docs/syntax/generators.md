@@ -59,7 +59,7 @@ When the generator fires:
 - `"On Input"` — after the user sends a message, before the bot replies
 - `"On Response"` — after the bot replies
 
-Note: there is a schema entry for an `"Initialization"` phase, but **it does not currently run**. Use `"On Input"` with a condition like `isNull(someVariable)` to initialize variables on first use instead. See [Gotchas](../reference/gotchas).
+Note: the schema previously listed an `"Initialization"` phase option but this was removed from the schema. Use `"On Input"` with a condition like `isNull(someVariable)` to initialize variables on first use instead. See [Gotchas](../reference/gotchas).
 
 ### condition
 
@@ -73,7 +73,7 @@ An expression. The generator only runs if this evaluates to truthy. Always set a
 
 ### lazy
 
-Default: `false`. When `true`, the generator fires during its phase but does not hold up the chat — the main response is delivered first and the generator finishes in the background. Useful for generating content that does not need to be ready immediately. Note that lazy generators may not be ready before the next turn starts.
+Default: `false`. **Note: in the current release, `lazy` is stored but has no effect on execution.** The stage always waits for all generators to complete before returning a response, regardless of this flag. Setting `lazy: true` is a no-op until this is implemented. ([source](https://github.com/Lord-Raven/statosphere/blob/e67cd9ffaf1ee63e7b5c7bce11462516f547f5f7/src/Stage.tsx#L849-L851))
 
 ### dependencies
 

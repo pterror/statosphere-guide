@@ -117,7 +117,7 @@ The user descends a dungeon. Each new room is randomly chosen from a pool.
 **Where it falls down:** "Random" in the procgen sense — seeded, reproducible, independent of the model — is not a thing here. Players who reload or branch the chat will get different rooms. If the experience hinges on a specific generated dungeon persisting across sessions, you cannot deliver that.
 
 :::tip Advanced
-A [custom function](../syntax/functions) body executes as JavaScript and can call `Math.random()`. The function's return value is what the expression sees — call it once, commit it to a variable, and treat the variable as the source of truth from then on. This is enough for "pick one of N rooms randomly per visit" but still cannot be seeded.
+A [custom function](../syntax/functions) body executes as real JavaScript and can call `Math.random()`. The function's return value is what the expression sees — call it once, commit it to a variable, and treat the variable as the source of truth from then on. This is enough for "pick one of N rooms randomly per visit" but still cannot be seeded. See [Advanced: full JavaScript bodies](../syntax/functions#advanced-full-javascript-bodies).
 :::
 
 ---
@@ -130,7 +130,7 @@ A simple card game — Blackjack, a tarot draw, a five-card poker hand. Deck shu
 
 **Sketch:** `deck` and `hand` as arrays of strings. `shuffle()` and `draw()` as custom functions. A classifier label `requesting a card` triggers a draw. Stage Direction surfaces the hand.
 
-**Where it falls down:** mathjs's array support is shallow, and your function bodies are documented as single-line expressions. Implementing a real shuffle inside that surface is awkward — the cleanest path leans on the JavaScript-in-function-bodies hatch (see the tip in [Patterns: classifier-as-RNG](./patterns#classifier-as-rng)). For a three-card tarot draw, fine. For maintaining state through a full hand of poker with discards, you are doing too much work in a system that wasn't built for it.
+**Where it falls down:** mathjs's array support is shallow. Implementing a real shuffle inside a single-expression body is awkward, but the [JavaScript mode](../syntax/functions#advanced-full-javascript-bodies) lets you write a proper Fisher-Yates shuffle. For a three-card tarot draw, fine. For maintaining state through a full hand of poker with discards, you are doing too much work in a system that wasn't built for it.
 
 ---
 

@@ -28,7 +28,7 @@ Known issues and non-obvious behaviors that affect people writing Statosphere co
 
 **Problem:** The built-in `replace(input, regex, newValue)` function has a bug where it references the local variable name `regexString` instead of the actual regex argument. Depending on your expression context, this may produce unexpected behavior or an error.
 
-**Workaround:** Define your own replace function that uses `split` and `join` for simple cases:
+**Workaround:** For simple literal-string substitution, define a replacement using `split` and `join`:
 
 ```json
 {
@@ -39,6 +39,16 @@ Known issues and non-obvious behaviors that affect people writing Statosphere co
 ```
 
 This treats `pattern` as a literal string (not a regex), but it works reliably for simple substitution.
+
+For full regex support, use the [JavaScript function body mode](../syntax/functions#advanced-full-javascript-bodies):
+
+```json
+{
+  "name": "regexReplace",
+  "parameters": "input, pattern, flags, replacement",
+  "body": "return input.replace(new RegExp(pattern, flags || 'g'), replacement);"
+}
+```
 
 ---
 

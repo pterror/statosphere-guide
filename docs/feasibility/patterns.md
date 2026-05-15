@@ -174,7 +174,7 @@ You want a coin flip or a small random outcome that *feels* random to the player
 Categories make labels mutually exclusive — exactly one wins. Threshold 0 ensures one always fires. The outcome is biased by the message content, so it's only random in a loose sense.
 
 :::tip Advanced
-For a real coin flip, a [custom function](../syntax/functions) body runs as JavaScript and can call `Math.random()`. Commit the result to a variable in a single update so it does not re-roll on every reference. This is undocumented in the rest of the guide — depend on it cautiously.
+For a real coin flip, a [custom function](../syntax/functions) body runs as real JavaScript and can call `Math.random()`. Commit the result to a variable in a single update so it does not re-roll on every reference. See [Advanced: full JavaScript bodies](../syntax/functions#advanced-full-javascript-bodies) for the full picture — including caveats about this being undocumented upstream.
 :::
 
 :::warning

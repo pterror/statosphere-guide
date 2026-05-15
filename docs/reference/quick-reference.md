@@ -33,7 +33,7 @@ A single-page cheat sheet of all field names, defaults, valid values, built-in f
 |-------|----------|-------------|
 | `name` | yes | Identifier used to call the function |
 | `parameters` | no | Comma-separated parameter list |
-| `body` | yes | mathjs expression; its value is returned |
+| `body` | yes | mathjs expression (or full JS with `return`) — see [Advanced mode](../syntax/functions#advanced-full-javascript-bodies) |
 
 ## Classifier fields
 

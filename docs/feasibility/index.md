@@ -27,7 +27,7 @@ What classifiers do **not** do well: extract arbitrary structured data from free
 This is where most "I'll build a dice game in Statosphere" ideas die. mathjs has `random()`, but Statosphere gives you no seeded RNG, no way to commit to a roll before the player sees the outcome, and no clean way to make randomness feel mechanical instead of narrative. You can fake dice with a classifier that "rolls" on free text, but it is not random — it is the model's choice with extra steps.
 
 :::tip Advanced
-The platform actually executes [custom function](../syntax/functions) bodies as JavaScript, not as bare mathjs expressions. That means `Math.random()` is reachable from inside a function body, even though the guide presents functions as single-line formulas. Treat this as a hatch, not a load-bearing pattern: the documented surface is mathjs, and a future tightening of the schema could close it.
+The platform actually executes [custom function](../syntax/functions) bodies as real JavaScript via `new Function(...)`, not as bare mathjs expressions. That means `Math.random()`, multi-line logic, and control flow are all available inside a function body, even though the guide presents functions as single-line formulas. See [Advanced: full JavaScript bodies](../syntax/functions#advanced-full-javascript-bodies) for how to use this. Treat it as a hatch, not a load-bearing pattern: this is undocumented upstream and a future tightening of the schema could close it.
 :::
 
 **4. Does your game require any of the following?**

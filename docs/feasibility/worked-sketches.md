@@ -62,7 +62,7 @@ A short narrative with five named scenes. Each scene unlocks the next when a con
 
 **Verdict:** Doable.
 
-**Sketch:** One `scene` variable (string). One boolean per unlock condition (`has_key`, `convinced_guard`). Classifier detects condition-meeting events. Content rules in Stage Direction inject scene-specific instructions: `condition: scene == "throne_room"` → `"The throne room is silent. The king watches the user."` See the [state machine pattern](./patterns#scene-state-machine).
+**Sketch:** One `scene` variable (string). One yes/no flag (a boolean — `true` or `false`) per unlock condition (`has_key`, `convinced_guard`). Classifier detects condition-meeting events. Content rules in Stage Direction inject scene-specific instructions: `condition: scene == "throne_room"` → `"The throne room is silent. The king watches the user."` See the [state machine pattern](./patterns#scene-state-machine).
 
 **Where it falls down:** Nothing serious. This is squarely in Statosphere's sweet spot.
 
@@ -100,7 +100,7 @@ A whodunit with three suspects, six clues, and an ending that depends on the pla
 
 **Sketch:** Six boolean `clue_*` variables, all starting false. One classifier detects clue-discovery events (one label per clue — or per category if clues cluster). Three suspect-interrogation classifiers detecting "currently interrogating X." A final classifier detects an accusation; a content rule gated on `accusation == "alex" && clue_letter && clue_alibi` triggers the win ending, with parallel rules for failure modes.
 
-**Where it falls down:** The classifier has to reliably distinguish "discovers the bloody letter" from "discusses the bloody letter already discovered." Idempotency is easier — let it re-fire, the boolean stays true. The harder problem is making the bot not spoil clues the player has not found; that needs Stage Direction discipline ("Do not reveal clues the user has not yet uncovered. Discovered clues: ...").
+**Where it falls down:** The classifier has to reliably distinguish "discovers the bloody letter" from "discusses the bloody letter already discovered." The second problem is easier than it looks — just let the classifier fire on the same clue twice without worrying about it, because the flag stays `true` either way. The harder problem is making the bot not spoil clues the player has not found; that needs Stage Direction discipline ("Do not reveal clues the user has not yet uncovered. Discovered clues: ...").
 
 ---
 
@@ -114,7 +114,7 @@ The user descends a dungeon. Each new room is randomly chosen from a pool.
   - **Closed list, narrative selection:** Let the bot pick which room comes next, prompted via Stage Direction with the list. Not random; the model decides.
   - **mathjs `random()`:** Works, but the value changes every evaluation. You need to commit it to a variable in a single update and never recompute. Doable with care.
 
-**Where it falls down:** "Random" in the procgen sense — seeded, reproducible, independent of the model — is not a thing here. Players who reload or branch the chat will get different rooms. If the experience hinges on a specific generated dungeon persisting across sessions, you cannot deliver that.
+**Where it falls down:** "Random" in the procgen sense — reproducible, independent of the model, the same dungeon every time you replay — is not a thing here. Players who reload or branch the chat will get different rooms. If the experience hinges on a specific generated dungeon persisting across sessions, you cannot deliver that.
 
 :::tip Advanced
 A [custom function](../syntax/functions) body executes as real JavaScript and can call `Math.random()`. The function's return value is what the expression sees — call it once, commit it to a variable, and treat the variable as the source of truth from then on. This is enough for "pick one of N rooms randomly per visit" but still cannot be seeded. See [Advanced: full JavaScript bodies](../syntax/functions#advanced-full-javascript-bodies).

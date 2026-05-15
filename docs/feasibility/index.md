@@ -18,13 +18,13 @@ If yes → continue.
 
 **2. Does the bot need to react to *categories* of player intent, not specific tokens?**
 
-"Is the player attacking?" "Is the player flirting?" "Is the player asking about an object?" — these are exactly what [classifiers](../syntax/classifiers) are for. Zero-shot entailment matches a hypothesis against the message; mutually-exclusive categories pick the best label.
+"Is the player attacking?" "Is the player flirting?" "Is the player asking about an object?" — these are exactly what [classifiers](../syntax/classifiers) are for. A classifier asks "is this label implied by what the player wrote?" for each label you set up, then fires on the best match. Mutually-exclusive categories (the `category` field) ensure only one wins.
 
-What classifiers do **not** do well: extract arbitrary structured data from free text. "What number did the player roll?" or "Which of fifty named items did they pick up?" are not zero-shot questions. You can sometimes corner them with multi-label classifiers (one label per item) or with [`capture()`](../syntax/expressions) on a regex, but both are brittle once the space gets large.
+What classifiers do **not** do well: extract arbitrary structured data from free text. "What number did the player roll?" or "Which of fifty named items did they pick up?" are not questions a classifier answers cleanly. You can sometimes corner them with multi-label classifiers (one label per item) or with [`capture()`](../syntax/expressions) on a regex, but both are brittle once the space gets large.
 
 **3. Does your game depend on randomness that isn't the LLM's whim?**
 
-This is where most "I'll build a dice game in Statosphere" ideas die. mathjs has `random()`, but Statosphere gives you no seeded RNG, no way to commit to a roll before the player sees the outcome, and no clean way to make randomness feel mechanical instead of narrative. You can fake dice with a classifier that "rolls" on free text, but it is not random — it is the model's choice with extra steps.
+This is where most "I'll build a dice game in Statosphere" ideas die. mathjs has `random()`, but Statosphere gives you no way to make random numbers that come back the same when you replay or branch the scene — no reproducible dice, no way to commit to a roll before the player sees the outcome, and no clean way to make randomness feel mechanical instead of narrative. You can fake dice with a classifier that "rolls" on free text, but it is not random — it is the model's choice with extra steps.
 
 :::tip Advanced
 The platform actually executes [custom function](../syntax/functions) bodies as real JavaScript via `new Function(...)`, not as bare mathjs expressions. That means `Math.random()`, multi-line logic, and control flow are all available inside a function body, even though the guide presents functions as single-line formulas. See [Advanced: full JavaScript bodies](../syntax/functions#advanced-full-javascript-bodies) for how to use this. Treat it as a hatch, not a load-bearing pattern: this is undocumented upstream and a future tightening of the schema could close it.

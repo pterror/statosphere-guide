@@ -2,7 +2,7 @@
 
 <div v-pre>
 
-Recurring building blocks. Most games decompose into a handful of these, composed. Each pattern names itself, describes what it does in one paragraph, and gives a sketch you can drop into a config and adapt. They are deliberately incomplete — the goal is to let you recognize the shape, not paste-and-ship.
+Recurring building blocks. Most games are built from a handful of these shapes. Recognize the shape and the rest is filling in details. Each pattern names itself, describes what it does in one paragraph, and gives a sketch you can drop into a config and adapt. They are deliberately incomplete — the goal is to let you recognize the shape, not paste-and-ship.
 
 For the syntax details, see the [Syntax](../syntax/overview) section. For full examples with explanation, see [Recipes](../recipes/stat-tracking).
 
@@ -136,19 +136,75 @@ Things that should happen "after a while." A counter increments each turn; a Sta
 ```json
 {
   "variables": [
-    { "name": "turn", "initialValue": "0" },
+    { "name": "turn", "initialValue": "0", "perTurnUpdate": "turn + 1" },
     { "name": "guard_alerted", "initialValue": "false" }
   ],
   "content": [
     { "category": "Stage Direction", "condition": "turn >= 5 and not guard_alerted",
-      "modification": "\"The guard's patrol is now passing nearby. They will notice the user if anything draws attention.\"" },
-    { "category": "Stage Direction", "condition": "true",
-      "modification": "(turn := turn + 1) > 0 ? \"\" : \"\"" }
+      "modification": "\"The guard's patrol is now passing nearby. They will notice the user if anything draws attention.\"" }
   ]
 }
 ```
 
-The increment-via-content-rule trick (`turn := turn + 1`) is ugly but reliable. The cleaner approach is to give the `turn` variable a `postResponse` update formula of `turn + 1` so it counts itself.
+The `perTurnUpdate` field on a variable runs its formula automatically at the start of every turn and saves the result back. `"turn + 1"` reads the current value of `turn` and gives back one more — Statosphere writes that as the new value of `turn`. No content rule needed.
+
+The Stage Direction fires whenever `turn` has crossed 5 and the guard has not been alerted yet. Once `guard_alerted` flips to `true`, that Stage Direction stops appearing.
+
+---
+
+## Approximating time
+
+Slice-of-life and time-flavored bots often want a sense of "what time of day is it?" or "how many days have passed?" None of these are real clocks — Statosphere has no background timer — but turn count gives you a workable proxy.
+
+### Turn count as time of day
+
+```json
+{
+  "variables": [
+    { "name": "turn", "initialValue": "0", "perTurnUpdate": "turn + 1" },
+    { "name": "timeLabel", "initialValue": "\"morning\"",
+      "perTurnUpdate": "turn < 5 ? \"morning\" : turn < 10 ? \"afternoon\" : \"evening\"" }
+  ],
+  "content": [
+    { "category": "Stage Direction", "condition": "true",
+      "modification": "\"It is currently \" + timeLabel + \".\""
+    }
+  ]
+}
+```
+
+`timeLabel` recalculates each turn from `turn`. This is not real time — it is a proxy — but it is perfectly fine for many narratives.
+
+### Day of week from turn count
+
+If a "day" is a fixed number of turns, you can derive a day name. mathjs does not support JavaScript-style array indexing (`["Mon",...][i]`), so the cleanest approach is a custom function:
+
+```json
+{
+  "functions": [
+    {
+      "name": "dayName",
+      "parameters": "n",
+      "body": "const days = [\"Mon\",\"Tue\",\"Wed\",\"Thu\",\"Fri\",\"Sat\",\"Sun\"]; return days[n % 7];"
+    }
+  ],
+  "variables": [
+    { "name": "turn", "initialValue": "0", "perTurnUpdate": "turn + 1" },
+    { "name": "dayLength", "initialValue": "8" }
+  ],
+  "content": [
+    { "category": "Stage Direction", "condition": "true",
+      "modification": "\"Today is \" + dayName(floor(turn / dayLength)) + \".\""
+    }
+  ]
+}
+```
+
+Every `dayLength` turns, the day number advances by one. The function cycles through all seven names, so after seven days it wraps back to Monday.
+
+:::tip Advanced
+If you need the real-world date or actual clock time, a custom function can read `Date.now()` — see [Advanced: full JavaScript bodies](../syntax/functions#advanced-full-javascript-bodies).
+:::
 
 ---
 
@@ -178,7 +234,7 @@ For a real coin flip, a [custom function](../syntax/functions) body runs as real
 :::
 
 :::warning
-None of this is seeded. Reload the chat, branch a message, or rewind: the rolls are gone. Don't promise reproducibility you can't deliver.
+None of this produces random numbers that come back the same when you replay the scene. Reload the chat, branch a message, or rewind: the rolls are gone. Don't promise reproducibility you can't deliver.
 :::
 
 ---

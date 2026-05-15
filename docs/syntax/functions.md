@@ -24,11 +24,11 @@ clamp(hp + healAmount, 0, max_hp)
 
 ### name
 
-The name you use to call this function in expressions. Pick something descriptive and short. Case-sensitive when called.
+The name you use to call this function in expressions. Pick something descriptive and short. Capitalization matters when you call them: a function named `hpLabel` cannot be called as `HPLabel`. (Variable names, by contrast, ignore capitalization.)
 
 ### parameters
 
-A comma-separated list of parameter names. These are the local variables available inside the function body. If a parameter has the same name as one of your config variables, the parameter takes priority inside the function — the global variable is not visible there.
+A comma-separated list of parameter names. These are the local variables available inside the function body. If a parameter has the same name as one of your config variables, the parameter wins inside the function — the global variable is not visible there. Rarely matters — just avoid reusing variable names as parameters if you can.
 
 ```
 "parameters": "value, lo, hi"
@@ -48,7 +48,7 @@ A formula the function evaluates and returns. For most uses, a single mathjs exp
 
 Write one formula. It can use `?` and `:` for choices (see [Expressions](./expressions#conditionals-ternary)). The result is what the function gives back.
 
-For cases where a single expression is not enough, the body can be full JavaScript — see [Advanced: full JavaScript bodies](#advanced-full-javascript-bodies) below.
+Functions can do more than this — see [Advanced](#advanced-full-javascript-bodies) below if you ever need it.
 
 ## When to use a custom function
 
@@ -199,7 +199,7 @@ Statosphere scans each function body for references to your config variables and
 
 The practical result: inside a function body, you reference a variable named `hp` by writing `hp` — Statosphere passes the current value in automatically at call time. You do not have to declare `hp` as a parameter. The same applies to other custom functions your body calls.
 
-One consequence: if a variable name and a parameter name collide, the explicitly declared parameter wins. Name your parameters clearly to avoid shadowing a variable unintentionally.
+One consequence: if a parameter has the same name as one of your config variables, the parameter wins inside the function — the global variable is not visible there. This rarely matters in practice; just avoid reusing variable names as parameter names if you can.
 
 ### Example: regex replace using JavaScript
 

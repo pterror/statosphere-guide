@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -e
+
+echo "Running VitePress build..."
+cd docs && bun run build
+
+echo "Pre-commit checks passed!"

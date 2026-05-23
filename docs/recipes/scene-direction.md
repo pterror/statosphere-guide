@@ -110,3 +110,9 @@ Then the image generator will pick up the new value on the next turn.
 If you do not need the background image, remove the `generators` section and the `background` variable. The Stage Direction rules still work on their own to keep the bot oriented.
 
 </div>
+
+## Try it
+
+<ClientOnly>
+  <StatosphereStudio embedded template="branching-scenario" />
+</ClientOnly>

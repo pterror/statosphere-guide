@@ -82,3 +82,9 @@ If the classifier gets the numbers wrong, the user can correct them directly:
 See [/setVar Command](../special/setvar).
 
 </div>
+
+## Try it
+
+<ClientOnly>
+  <StatosphereStudio embedded template="hp-tracker" />
+</ClientOnly>

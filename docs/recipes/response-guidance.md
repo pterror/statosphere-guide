@@ -117,3 +117,9 @@ Replace the generic drift reminder with something specific to your character:
 ```
 
 </div>
+
+## Try it
+
+<ClientOnly>
+  <StatosphereStudio embedded template="persistent-memory" />
+</ClientOnly>
